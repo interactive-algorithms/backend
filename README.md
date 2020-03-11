@@ -6,9 +6,9 @@ user object
 
 ```json
 {
-    user : [{
-        name : string
-        id : string
+    "user" : [{
+        "name" : string,
+        "id" : string
     }]
 }
 ```
@@ -17,7 +17,7 @@ user object
 - POST login
 ```json
 {
-    identifier : string,
-    password : string
+    "identifier" : string,
+    "password" : string
 }
 ```
