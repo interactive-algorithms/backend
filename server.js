@@ -3,9 +3,9 @@ const app = express();
 
 require("dotenv").config();
 
-const router = require("./server/routers/main.js");
+const router = require("server/routers/main.js");
 
-require("./server/db/main"); // init db
+require("server/db/main"); // init db
 
 app.use(router);
 

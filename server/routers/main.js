@@ -1,4 +1,5 @@
 const express = require("express");
+const connection = require("server/db/main.js")
 const app = express.Router();
 
 app.get("/", function(req, res) {
