@@ -1,7 +1,11 @@
 const express = require("express");
 const app = express();
 
-const router = require("./server/routers/main.js");
+require("dotenv").config();
+
+const router = require("server/routers/main.js");
+
+require("server/db/main"); // init db
 
 app.use(router);
 
