@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require('cors')
 const app = express();
 
 require("dotenv").config();
@@ -6,6 +7,9 @@ require("dotenv").config();
 const router = require("server/routers/main.js");
 
 require("server/db/main"); // init db
+
+app.use(express.json());
+//app.use(cors());
 
 app.use(router);
 
