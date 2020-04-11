@@ -19,7 +19,8 @@ const createImagesTable = "CREATE TABLE IF NOT EXISTS `interactive-algorithms`.`
 
 const createSectionsTable ="CREATE TABLE IF NOT EXISTS `interactive-algorithms`.`sections` (`id` INT NOT NULL AUTO_INCREMENT,`title` VARCHAR(256) NOT NULL,`position` INT NOT NULL,`articleID` INT NOT NULL,PRIMARY KEY (`id`));"
 
-const createMessagesTable = "CREATE TABLE IF NOT EXISTS `interactive-algorithms`.`messages` (`id` INT NOT NULL AUTO_INCREMENT,`content` TEXT(65535) NULL,`senderID` VARCHAR(45) NOT NULL,`time` TIMESTAMP NOT NULL,`sectionID` INT NOT NULL,PRIMARY KEY (`id`));";
+const createMessagesTable = "CREATE TABLE IF NOT EXISTS `interactive-algorithms`.`messages` (`id` INT NOT NULL AUTO_INCREMENT,`time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,`content` TEXT NULL,`username` VARCHAR(45) NOT NULL,`sectionID` INT NOT NULL,PRIMARY KEY (`id`));";
+
 
 promisePool.query(createUserTable, (err, res) => {
     if(err) console.log(err);
