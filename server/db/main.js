@@ -13,15 +13,19 @@ const createUserTable = "CREATE TABLE IF NOT EXISTS `interactive-algorithms`.`us
 
 const createArticlesTable = "CREATE TABLE IF NOT EXISTS `interactive-algorithms`.`articles` (`id` INT NOT NULL AUTO_INCREMENT,`title` VARCHAR(256) NULL,PRIMARY KEY (`id`));";
 
-const createGenericItemsTable = "CREATE TABLE IF NOT EXISTS `interactive-algorithms`.`generic_items` (`id` INT NOT NULL AUTO_INCREMENT,`sectionID` INT NOT NULL,`position` INT NOT NULL,`content` TEXT(65535) NULL,PRIMARY KEY (`id`));";
+const createGenericItemsTable = "CREATE TABLE IF NOT EXISTS `interactive-algorithms`.`generic_items` (`id` INT NOT NULL AUTO_INCREMENT,`sectionID` INT NOT NULL,`position` INT NULL,`type` VARCHAR(256) NOT NULL,`content` TEXT(65535) NULL,PRIMARY KEY (`id`));"
 
-const createImagesTable = "CREATE TABLE `interactive-algorithms`.`images` (`id` INT NOT NULL AUTO_INCREMENT,`genericItemID` INT NOT NULL,`URL` VARCHAR(256) NOT NULL,`alt` VARCHAR(256) NOT NULL,`description` TEXT(65535) NULL,PRIMARY KEY (`id`));";
+const createImagesTable = "CREATE TABLE IF NOT EXISTS `interactive-algorithms`.`images` (`id` INT NOT NULL AUTO_INCREMENT,`genericItemID` INT NOT NULL,`URL` VARCHAR(256) NOT NULL,`alt` VARCHAR(256) NOT NULL,`description` TEXT(65535) NULL,PRIMARY KEY (`id`));";
 
-const createSectionsTable = "CREATE TABLE `interactive-algorithms`.`sections` (`id` INT NOT NULL AUTO_INCREMENT,`articleID` INT NOT NULL,`title` VARCHAR(256) NOT NULL,PRIMARY KEY (`id`));"
+const createSectionsTable ="CREATE TABLE IF NOT EXISTS `interactive-algorithms`.`sections` (`id` INT NOT NULL AUTO_INCREMENT,`title` VARCHAR(256) NOT NULL,`position` INT NOT NULL,`articleID` INT NOT NULL,PRIMARY KEY (`id`));"
 
 promisePool.query(createUserTable, (err, res) => {
     if(err) console.log(err);
 });
+
+const truncate = table => {
+    return `TRUNCATE TABLE ${table};`
+}
 
 promisePool.query(createArticlesTable, (err, res) => {
     if(err) console.log(err);
@@ -31,7 +35,19 @@ promisePool.query(createArticlesTable, (err, res) => {
             if(err) console.log(err);
             promisePool.query(createSectionsTable, (err, res) => {
                 if(err) console.log(err);
-                importAllArticles();
+                promisePool.query(truncate("articles"), (err, res) => {
+                    if(err) console.log(err);
+                    promisePool.query(truncate("generic_items"), (err, res) => {
+                        if(err) console.log(err);
+                        promisePool.query(truncate("images"), (err, res) => {
+                            if(err) console.log(err);
+                            promisePool.query(truncate("sections"), (err, res) => {
+                                if(err) console.log(err);
+                                importAllArticles();
+                            })
+                        });
+                    });
+                });
             })
         });
     });
@@ -45,19 +61,19 @@ const importAllArticles = () => {
                 const lines = data.split("\n").map(line => {
                     return line.split(" ").filter(s => s != "");
                 });
-                const title = lines[0][1];
+                const title = lines[0].slice(1, lines[0].length).join(" ");
                 console.log(title)
                 const amountOfSections = Number(lines[1][1]);
                 console.log(amountOfSections)
                 const sectionTitles = [];
                 for(let i = 0; i < amountOfSections; i++){
-                    sectionTitles.push(lines[2 + i].join().replace(",", " "));
+                    sectionTitles.push(lines[2 + i].join(" "));
                 }
                 console.log(sectionTitles)
                 const sectionContent = {};
                 let idx = 2 + amountOfSections;
                 while(idx < lines.length){
-                    const section = Number(lines[idx++][0]);
+                    const section = Number(lines[idx++][0]) - 1;
                     sectionContent[section] = [];
                     console.log(section)
                     while(
@@ -100,7 +116,7 @@ const importAllArticles = () => {
                                 description : description.substring(0, description.length - 1)
                             })
                         }else{
-                            const content = lines[idx].slice(1, lines[idx].length).join().substring(1, lines[idx].slice(1, lines[idx].length).join().length - 1);
+                            const content = lines[idx].slice(1, lines[idx].length).join(" ").substring(1, lines[idx].slice(1, lines[idx].length).join(" ").length - 1);
                             sectionContent[section].push({
                                 type : lines[idx][0],
                                 content : content
@@ -110,8 +126,31 @@ const importAllArticles = () => {
                     }
                     console.log(sectionContent[section])
                 }
-                // insert data
-                //promisePool.query("INSERT INTO articles")
+                // insert data in db
+                promisePool
+                .query(`INSERT INTO articles (title) VALUES ('${title}')`)
+                .then(([articleInsertionResult]) => {
+                    console.log(articleInsertionResult.insertId);
+                    for(let i = 0; i < amountOfSections; i++){
+                        promisePool
+                        .query(`INSERT INTO sections (title, position, articleID) VALUES ('${sectionTitles[i]}',${i},${articleInsertionResult.insertId});`)
+                        .then(([sectionInsertionResult]) => {
+                            console.log(sectionInsertionResult)
+                            for(let j = 0; j < sectionContent[i].length; j++){
+                                const item = sectionContent[i][j];
+                                promisePool
+                                .query(`INSERT INTO generic_items (sectionID, position, type, content) VALUES (${sectionInsertionResult.insertId}, ${j}, '${item.type}', '${item.content || ""}')`)
+                                .then(([itemInsertionResult]) => {
+                                    console.log(itemInsertionResult)
+                                    if(item.type == 'img'){
+                                        promisePool
+                                        .query(`INSERT INTO images (genericItemID, URL, alt, description) VALUES (${itemInsertionResult.insertId}, '${item.url}', '${item.alt}', '${item.description}')`);   
+                                    }
+                                })
+                            }
+                        })
+                    }
+                })
             })
         }
     });
