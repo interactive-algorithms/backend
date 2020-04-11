@@ -56,26 +56,21 @@ promisePool.query(createArticlesTable, (err, res) => {
 const importAllArticles = () => {
     fs.readdir("server/db/articles", (err, files) => {
         for(const file of files){
-            console.log(file)
             fs.readFile(`server/db/articles/${file}`, 'utf8', (err, data) => {
                 const lines = data.split("\n").map(line => {
                     return line.split(" ").filter(s => s != "");
                 });
                 const title = lines[0].slice(1, lines[0].length).join(" ");
-                console.log(title)
                 const amountOfSections = Number(lines[1][1]);
-                console.log(amountOfSections)
                 const sectionTitles = [];
                 for(let i = 0; i < amountOfSections; i++){
                     sectionTitles.push(lines[2 + i].join(" "));
                 }
-                console.log(sectionTitles)
                 const sectionContent = {};
                 let idx = 2 + amountOfSections;
                 while(idx < lines.length){
                     const section = Number(lines[idx++][0]) - 1;
                     sectionContent[section] = [];
-                    console.log(section)
                     while(
                         idx < lines.length &&
                         lines[idx].length != 1
@@ -124,24 +119,20 @@ const importAllArticles = () => {
                         }
                         idx++;
                     }
-                    console.log(sectionContent[section])
                 }
                 // insert data in db
                 promisePool
                 .query(`INSERT INTO articles (title) VALUES ('${title}')`)
                 .then(([articleInsertionResult]) => {
-                    console.log(articleInsertionResult.insertId);
                     for(let i = 0; i < amountOfSections; i++){
                         promisePool
                         .query(`INSERT INTO sections (title, position, articleID) VALUES ('${sectionTitles[i]}',${i},${articleInsertionResult.insertId});`)
                         .then(([sectionInsertionResult]) => {
-                            console.log(sectionInsertionResult)
                             for(let j = 0; j < sectionContent[i].length; j++){
                                 const item = sectionContent[i][j];
                                 promisePool
                                 .query(`INSERT INTO generic_items (sectionID, position, type, content) VALUES (${sectionInsertionResult.insertId}, ${j}, '${item.type}', '${item.content || ""}')`)
                                 .then(([itemInsertionResult]) => {
-                                    console.log(itemInsertionResult)
                                     if(item.type == 'img'){
                                         promisePool
                                         .query(`INSERT INTO images (genericItemID, URL, alt, description) VALUES (${itemInsertionResult.insertId}, '${item.url}', '${item.alt}', '${item.description}')`);   
