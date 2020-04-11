@@ -6,7 +6,7 @@ const authorize = (req, res, next) => {
         res.sendStatus(401);
     } else {
         jwt.verify(token, process.env.TOKEN_SECRET, (err, data) => {            
-            if (err.name == "TokenExpiredError"){
+            if (err && err.name == "TokenExpiredError"){
                 res.status(401).send("token expired");
             }else if(err){
                 throw err;
@@ -14,15 +14,15 @@ const authorize = (req, res, next) => {
 
             if (data) {
                 req.username = data.username;
-                next();
+                sendToken(req, res, next, data.username);
             }
         });
     }
 };
 
-const sendToken = (req, res, next) => {
+const sendToken = (req, res, next, username = null) => {
     jwt.sign({
-        username : req.body.username 
+        username : (req.body && req.body.username ? req.body.username : username)
     }, process.env.TOKEN_SECRET, {
         expiresIn: 60
     }, (err, token) => {
@@ -31,7 +31,7 @@ const sendToken = (req, res, next) => {
         }else{
             res.cookie(
                 "TOKEN", token,
-                {maxAge : 60, httpOnly : true}
+                {maxAge : 60000, httpOnly : true}
             );
             next();
         }
