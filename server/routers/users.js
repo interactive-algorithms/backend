@@ -33,6 +33,32 @@ router.post("/signup", createUser, sendToken, (req, res) => {
     res.status(200).send({message : "user created"});
 })
 
+const login = (req, res, next) => {
+    const username = req.body.username;
+    const email = req.body.email;
+    const providedPassword = req.body.password;
+    pool.query(
+        `SELECT password FROM users WHERE username = ? OR email = ? LIMIT 1`,
+        [username, email]
+    ).then(([result]) => {
+        if(result.length == 0){
+            res.sendStatus(401);
+        }else{
+            bcrypt.compare(providedPassword, result[0].password, (err, result) => {
+                if(result){
+                    next();
+                }else{
+                    res.sendStatus(401);
+                }
+            })
+        }
+    });
+}
+
+router.post("/login", login, sendToken, (req, res) => {
+    res.sendStatus(200);
+})
+
 // TEST Authorization
 router.get("/test", authorize, (req, res) => {
     res.status(200).send({
