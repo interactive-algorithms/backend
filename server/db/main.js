@@ -23,10 +23,6 @@ promisePool.query(createUserTable, (err, res) => {
     if(err) console.log(err);
 });
 
-const truncate = table => {
-    return `TRUNCATE TABLE ${table};`
-}
-
 promisePool.query(createArticlesTable, (err, res) => {
     if(err) console.log(err);
     promisePool.query(createGenericItemsTable, (err, res) => {
@@ -35,19 +31,7 @@ promisePool.query(createArticlesTable, (err, res) => {
             if(err) console.log(err);
             promisePool.query(createSectionsTable, (err, res) => {
                 if(err) console.log(err);
-                promisePool.query(truncate("articles"), (err, res) => {
-                    if(err) console.log(err);
-                    promisePool.query(truncate("generic_items"), (err, res) => {
-                        if(err) console.log(err);
-                        promisePool.query(truncate("images"), (err, res) => {
-                            if(err) console.log(err);
-                            promisePool.query(truncate("sections"), (err, res) => {
-                                if(err) console.log(err);
-                                importAllArticles();
-                            })
-                        });
-                    });
-                });
+                importAllArticles();
             })
         });
     });
@@ -122,20 +106,26 @@ const importAllArticles = () => {
                 }
                 // insert data in db
                 promisePool
-                .query(`INSERT INTO articles (title) VALUES ('${title}')`)
-                .then(([articleInsertionResult]) => {
-                    for(let i = 0; i < amountOfSections; i++){
+                .query(`SELECT id FROM articles WHERE title='${title}' LIMIT 1`)
+                .then(([possiblyExistingArticle]) => {
+                    if(possiblyExistingArticle.length == 0){
                         promisePool
-                        .query(`INSERT INTO sections (title, position, articleID) VALUES ('${sectionTitles[i]}',${i},${articleInsertionResult.insertId});`)
-                        .then(([sectionInsertionResult]) => {
-                            for(let j = 0; j < sectionContent[i].length; j++){
-                                const item = sectionContent[i][j];
+                        .query(`INSERT INTO articles (title) VALUES ('${title}')`)
+                        .then(([articleInsertionResult]) => {
+                            for(let i = 0; i < amountOfSections; i++){
                                 promisePool
-                                .query(`INSERT INTO generic_items (sectionID, position, type, content) VALUES (${sectionInsertionResult.insertId}, ${j}, '${item.type}', '${item.content || ""}')`)
-                                .then(([itemInsertionResult]) => {
-                                    if(item.type == 'img'){
+                                .query(`INSERT INTO sections (title, position, articleID) VALUES ('${sectionTitles[i]}',${i},${articleInsertionResult.insertId});`)
+                                .then(([sectionInsertionResult]) => {
+                                    for(let j = 0; j < sectionContent[i].length; j++){
+                                        const item = sectionContent[i][j];
                                         promisePool
-                                        .query(`INSERT INTO images (genericItemID, URL, alt, description) VALUES (${itemInsertionResult.insertId}, '${item.url}', '${item.alt}', '${item.description}')`);   
+                                        .query(`INSERT INTO generic_items (sectionID, position, type, content) VALUES (${sectionInsertionResult.insertId}, ${j}, '${item.type}', '${item.content || ""}')`)
+                                        .then(([itemInsertionResult]) => {
+                                            if(item.type == 'img'){
+                                                promisePool
+                                                .query(`INSERT INTO images (genericItemID, URL, alt, description) VALUES (${itemInsertionResult.insertId}, '${item.url}', '${item.alt}', '${item.description}')`);   
+                                            }
+                                        })
                                     }
                                 })
                             }

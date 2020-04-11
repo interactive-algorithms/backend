@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "NODE_PATH=. node server/app.js",
-    "dev": "NODE_PATH=. nodemon server/app.js"
+    "dev": "NODE_PATH=. nodemon server/app.js",
+    "reset-articles" : "NODE_PATH=. node server/db/resetArticles.js"
   },
   "repository": {
     "type": "git",
