@@ -1,14 +1,14 @@
 const jwt = require("jsonwebtoken");
 
-const auth = (req, res, next) => {
-    const token = req.header("Authorization");
+const authorize = (req, res, next) => {
+    const token = req.cookies.TOKEN;
     if(!token) {
         res.sendStatus(401);
     } else {
-        jwt.verify(token, process.env.TOKEN_SECRET, (err, verified) => {
+        jwt.verify(token, process.env.TOKEN_SECRET, (err, data) => {
             if (err) throw err;
-            if (verified) {
-                req.userID = verified;
+            if (data) {
+                req.username = data.username;
                 next();
             } else {
                 res.sendStatus(401);
@@ -17,4 +17,23 @@ const auth = (req, res, next) => {
     }
 };
 
-module.exports = auth;
+const sendToken = (req, res, next) => {
+    jwt.sign({
+        username : req.body.username 
+    }, process.env.TOKEN_SECRET, (err, token) => {
+        if(err){
+            res.sendStatus(500);
+        }else{
+            res.cookie(
+                "TOKEN", token,
+                {maxAge : 60, httpOnly : true}
+            );
+            next();
+        }
+    })
+}
+
+module.exports = {
+    authorize,
+    sendToken
+};

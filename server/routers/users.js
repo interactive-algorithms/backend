@@ -2,11 +2,11 @@ const bcrypt = require("bcrypt")
 const pool = require("server/db/main.js")
 const express = require("express")
 const router = express.Router();
-const auth = require("./middleware/auth")
+const {authorize, sendToken} = require("./middleware/auth")
 
 const saltRounds = 12;
 
-router.post("/signup", async (req, res) => {
+const createUser = (req, res, next) => {
     const username = req.body.username;
     const email = req.body.email;
     const password = req.body.password;
@@ -23,14 +23,21 @@ router.post("/signup", async (req, res) => {
                 `INSERT INTO users (username, email, password) VALUES (?,?,?)`,
                 [username, email, hash]
             ).then(() => {
-                res.status(200).send({message : "user created"});
+                next();
             });
         });
     });
+};
+
+router.post("/signup", createUser, sendToken, (req, res) => {
+    res.status(200).send({message : "user created"});
 })
 
-router.get("/hej", auth, (req, res) => {
-    
+// TEST Authorization
+router.get("/test", authorize, (req, res) => {
+    res.status(200).send({
+        username : req.username
+    });
 })
 
 module.exports = router;

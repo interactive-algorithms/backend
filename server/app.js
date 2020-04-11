@@ -1,15 +1,17 @@
 const express = require("express");
 const cors = require('cors')
 const app = express();
+const cookieParser = require('cookie-parser')
 
 require("dotenv").config();
 
-const router = require("server/routers/main.js");
+const router = require("./routers/main.js");
 
-require("server/db/main"); // init db
+require("./db/main"); // init db
 
 app.use(express.json());
 //app.use(cors());
+app.use(cookieParser())
 
 app.use(router);
 
