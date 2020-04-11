@@ -73,7 +73,8 @@ router.get("/:id", (req, res) => {
                 article.sections.push({
                     title : item.sectionTitle,
                     id : item.sectionID,
-                    content : []
+                    content : [],
+                    messages : []
                 })
             }
             const obj = item.type == 'img' ?
@@ -89,8 +90,36 @@ router.get("/:id", (req, res) => {
             ;
             article.sections[sectionIndices[item.sectionID]].content.push(obj);
         }
-        res.send({
-            article
+        pool
+        .query(
+            `
+            SELECT
+                username,
+                messages.id AS id,
+                time,
+                content,
+                sectionID
+            FROM
+                sections
+            RIGHT JOIN
+                messages ON sections.id = messages.sectionID
+            WHERE
+                sections.articleID = ?
+            ;`,
+            [articleID]
+        )
+        .then(([messages]) => {
+            for(const message of messages){
+                article.sections[sectionIndices[message.sectionID]].messages.push({
+                    username : message.username,
+                    id : message.id,
+                    time : message.time,
+                    content : message.content
+                });
+            }
+            res.send({
+                article
+            })
         })
     })
 })
