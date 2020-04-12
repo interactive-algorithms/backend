@@ -21,4 +21,38 @@ router.post("/:sectionID", authorize, (req, res) => {
     })
 })
 
+/*
+pool
+.query(
+    `
+    SELECT
+        username,
+        messages.id AS id,
+        time,
+        content,
+        sectionID
+    FROM
+        sections
+    RIGHT JOIN
+        messages ON sections.id = messages.sectionID
+    WHERE
+        sections.articleID = ?
+    ;`,
+    [articleID]
+)
+.then(([messages]) => {
+    for(const message of messages){
+        article.sections[sectionIndices[message.sectionID]].messages.push({
+            username : message.username,
+            id : message.id,
+            time : message.time,
+            content : message.content
+        });
+    }
+    res.send({
+        article
+    })
+})
+*/
+
 module.exports = router;

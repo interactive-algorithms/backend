@@ -27,7 +27,7 @@ router.get("/", (req, res) => {
             }
             articles[section.articleID].sections.push({
                 id : section.sectionID,
-                sectionTitle : section.sectionTitle
+                title : section.sectionTitle
             })
         }
         res.send({articles})
@@ -62,6 +62,7 @@ router.get("/:id", (req, res) => {
     ).then(([items]) => {
         const sectionIndices = {}
         const article = {
+            id: articleID,
             sections : []
         }
         for(const item of items){
@@ -73,8 +74,7 @@ router.get("/:id", (req, res) => {
                 article.sections.push({
                     title : item.sectionTitle,
                     id : item.sectionID,
-                    content : [],
-                    messages : []
+                    content : []
                 })
             }
             const obj = item.type == 'img' ?
@@ -90,37 +90,7 @@ router.get("/:id", (req, res) => {
             ;
             article.sections[sectionIndices[item.sectionID]].content.push(obj);
         }
-        pool
-        .query(
-            `
-            SELECT
-                username,
-                messages.id AS id,
-                time,
-                content,
-                sectionID
-            FROM
-                sections
-            RIGHT JOIN
-                messages ON sections.id = messages.sectionID
-            WHERE
-                sections.articleID = ?
-            ;`,
-            [articleID]
-        )
-        .then(([messages]) => {
-            for(const message of messages){
-                article.sections[sectionIndices[message.sectionID]].messages.push({
-                    username : message.username,
-                    id : message.id,
-                    time : message.time,
-                    content : message.content
-                });
-            }
-            res.send({
-                article
-            })
-        })
+        res.send({article});
     })
 })
 
