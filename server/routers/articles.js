@@ -16,16 +16,18 @@ router.get("/", (req, res) => {
         ORDER BY
             position`
     ).then(([sections]) => {
-        const articles = {};
+        const articles = [];
+        const articleIndices = {};
         for(const section of sections){
-            if(!articles[section.articleID]){
-                articles[section.articleID] = {
+            if(articleIndices[section.articleID] == undefined){
+                articleIndices[section.articleID] = articles.length;
+                articles.push({
                     sections : [],
                     title : section.articleTitle,
                     id : section.articleID
-                }
+                })
             }
-            articles[section.articleID].sections.push({
+            articles[articleIndices[section.articleID]].sections.push({
                 id : section.sectionID,
                 title : section.sectionTitle
             })
