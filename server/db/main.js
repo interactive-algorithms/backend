@@ -1,4 +1,6 @@
 const fs = require('fs');
+const bcrypt = require("bcrypt")
+const {saltRounds} = require("server/var")
 
 const mysql = require('mysql2');
 const pool = mysql.createPool({
@@ -7,6 +9,7 @@ const pool = mysql.createPool({
     password : process.env.DB_PASSWORD,
     database : `interactive-algorithms`
 });
+
 const promisePool = pool.promise();
 
 const createUserTable = "CREATE TABLE IF NOT EXISTS `interactive-algorithms`.`users` (`id` INT NOT NULL AUTO_INCREMENT,`username` VARCHAR(45) NOT NULL,`email` VARCHAR(256) NOT NULL,`password` VARCHAR(256) NOT NULL, PRIMARY KEY (`id`),UNIQUE INDEX `id_UNIQUE` (`id` ASC),UNIQUE INDEX `email_UNIQUE` (`email` ASC),UNIQUE INDEX `username_UNIQUE` (`username` ASC));";
@@ -24,6 +27,19 @@ const createMessagesTable = "CREATE TABLE IF NOT EXISTS `interactive-algorithms`
 
 promisePool.query(createUserTable, (err, res) => {
     if(err) console.log(err);
+    promisePool.query(
+        `SELECT id FROM users WHERE username = ? OR email = ? LIMIT 1`,
+        ["test", "test@gmail.com"]
+    ).then(([existingUsers]) => {
+        if(existingUsers.length == 0){
+            bcrypt.hash("test", saltRounds, (err, hash) => {
+                promisePool.query(
+                    `INSERT INTO users (username, email, password) VALUES (?,?,?)`,
+                    ["test", "test@gmail.com", hash]
+                );
+            });
+        }
+    });
 });
 
 promisePool.query(createArticlesTable, (err, res) => {

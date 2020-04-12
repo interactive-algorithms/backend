@@ -1,12 +1,8 @@
+const jwt = require("jsonwebtoken");
 const pool = require("server/db/main.js");
-const express = require("express");
-const router = express.Router();
-const {authorize} = require("./middleware/auth")
+const cookieParser = require('cookieparser')
 
-router.post("/:sectionID", authorize, (req, res) => {
-    const sectionID = req.params.sectionID;
-    const message = req.body.message;
-    const username = req.username;
+const insertMessage = (sectionID, username, message, callback) => {
     pool
     .query(
         "INSERT INTO messages (content, username, sectionID) VALUES (?, ?, ?)",
@@ -14,45 +10,67 @@ router.post("/:sectionID", authorize, (req, res) => {
     )
     .then(([messageQueryResult]) => {
         pool
-        .query(`SELECT * FROM messages WHERE id = ${messageQueryResult.insertId}`)
+        .query(`SELECT 
+            username,
+            messages.id AS id,
+            time,
+            content
+        FROM messages WHERE id = ${messageQueryResult.insertId}`)
         .then(([[message]]) => {
-            res.send(message);
+            callback(message);
         })
     })
-})
+}
 
-/*
-pool
-.query(
-    `
-    SELECT
-        username,
-        messages.id AS id,
-        time,
-        content,
-        sectionID
-    FROM
-        sections
-    RIGHT JOIN
-        messages ON sections.id = messages.sectionID
-    WHERE
-        sections.articleID = ?
-    ;`,
-    [articleID]
-)
-.then(([messages]) => {
-    for(const message of messages){
-        article.sections[sectionIndices[message.sectionID]].messages.push({
-            username : message.username,
-            id : message.id,
-            time : message.time,
-            content : message.content
-        });
-    }
-    res.send({
-        article
+const sendAllMessages = (socket, sectionID) => {
+    pool
+    .query(
+        `
+        SELECT
+            username,
+            messages.id AS id,
+            time,
+            content
+        FROM
+            messages
+        WHERE
+            messages.sectionID = ?
+        ;`,
+        [sectionID]
+    )
+    .then(([messages]) => {
+        socket.emit("all", messages);
     })
-})
-*/
+}
 
-module.exports = router;
+module.exports = io => {
+    const messaging = io.of("/messaging")
+    .use((socket, next) => {
+        const cookies = cookieParser.parse(socket.request.headers.cookie);
+        const token = cookies.TOKEN;
+        if(token){
+            jwt.verify(token, process.env.TOKEN_SECRET, (err, data) => { 
+                if (!err) {
+                    socket.username = data.username;
+                    next();
+                }
+            })  
+        }
+    })
+    .on("connection", socket => {
+
+        socket.on("joinSectionChat", sectionID => {
+            socket.sectionID = sectionID;
+            socket.join(sectionID);
+            sendAllMessages(socket, sectionID);
+        })
+
+        socket.on("post", message => {
+            if(socket.sectionID && socket.username){
+                insertMessage(socket.sectionID, socket.username, message, (messageObject) => {
+                    messaging.in(socket.sectionID).emit("new", messageObject);
+                })
+            }
+        })
+    })
+};

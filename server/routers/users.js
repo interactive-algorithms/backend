@@ -4,7 +4,7 @@ const express = require("express")
 const router = express.Router();
 const {authorize, sendToken} = require("./middleware/auth")
 
-const saltRounds = 12;
+const {saltRounds} = require("server/var")
 
 const createUser = (req, res, next) => {
     const username = req.body.username;
