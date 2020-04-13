@@ -93,6 +93,14 @@ router.get("/user", authorize, (req, res) => {
     })
 })
 
+router.post("/logout", (req, res) => {
+    res.cookie(
+        "TOKEN", null,
+        {maxAge : 0, httpOnly : true}
+    );
+    res.sendStatus(200);
+})
+
 // TEST Authorization
 router.get("/test", authorize, (req, res) => {
     res.status(200).send({
