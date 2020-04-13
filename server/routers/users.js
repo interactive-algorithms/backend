@@ -47,7 +47,7 @@ const login = (req, res, next) => {
     const user = req.body.user;
     const providedPassword = req.body.password;
     pool.query(
-        `SELECT password, id FROM users WHERE username = ? OR email = ? LIMIT 1`,
+        `SELECT password, id, username FROM users WHERE username = ? OR email = ? LIMIT 1`,
         [user, user]
     ).then(([result]) => {
         if(result.length == 0){
@@ -55,7 +55,8 @@ const login = (req, res, next) => {
         }else{
             bcrypt.compare(providedPassword, result[0].password, (err, bcryptResult) => {
                 if(bcryptResult){
-                    req.userID = result[0].id
+                    req.userID = result[0].id;
+                    req.username = result[0].username;
                     next();
                 }else{
                     res.sendStatus(401);

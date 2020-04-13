@@ -12,15 +12,15 @@ const authorize = (req, res, next) => {
                 throw err;
             }else if (data) {
                 req.username = data.username;
-                sendToken(req, res, next, data.username);
+                sendToken(req, res, next);
             }
         });
     }
 };
 
-const sendToken = (req, res, next, username = null) => {
+const sendToken = (req, res, next) => {
     jwt.sign({
-        username : (req.body && req.body.username ? req.body.username : username)
+        username : (req.body && req.body.username ? req.body.username : req.username)
     }, process.env.TOKEN_SECRET, {
         expiresIn: 60
     }, (err, token) => {
@@ -29,7 +29,7 @@ const sendToken = (req, res, next, username = null) => {
         }else{
             res.cookie(
                 "TOKEN", token,
-                {maxAge : 60000000, httpOnly : true}
+                {maxAge : 60000, httpOnly : true}
             );
             next();
         }
