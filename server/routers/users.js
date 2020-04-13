@@ -22,7 +22,8 @@ const createUser = (req, res, next) => {
             pool.query(
                 `INSERT INTO users (username, email, password) VALUES (?,?,?)`,
                 [username, email, hash]
-            ).then(() => {
+            ).then(([res]) => {
+                req.userID = res.insertId;
                 next();
             });
         });
@@ -30,7 +31,16 @@ const createUser = (req, res, next) => {
 };
 
 router.post("/signup", createUser, sendToken, (req, res) => {
-    res.status(200).send({message : "user created"});
+    pool.query(
+        `
+        SELECT
+            username, email, id
+        FROM users
+        WHERE id = ${req.userID}
+        `
+    ).then(([[user]]) => {
+        res.status(200).send({user});
+    })
 })
 
 const login = (req, res, next) => {
@@ -38,14 +48,15 @@ const login = (req, res, next) => {
     const email = req.body.email;
     const providedPassword = req.body.password;
     pool.query(
-        `SELECT password FROM users WHERE username = ? OR email = ? LIMIT 1`,
+        `SELECT password, id FROM users WHERE username = ? OR email = ? LIMIT 1`,
         [username, email]
     ).then(([result]) => {
         if(result.length == 0){
             res.sendStatus(401);
         }else{
-            bcrypt.compare(providedPassword, result[0].password, (err, result) => {
-                if(result){
+            bcrypt.compare(providedPassword, result[0].password, (err, bcryptResult) => {
+                if(bcryptResult){
+                    req.userID = result[0].id
                     next();
                 }else{
                     res.sendStatus(401);
@@ -56,7 +67,16 @@ const login = (req, res, next) => {
 }
 
 router.post("/login", login, sendToken, (req, res) => {
-    res.sendStatus(200);
+    pool.query(
+        `
+        SELECT
+            username, email, id
+        FROM users
+        WHERE id = ${req.userID}
+        `
+    ).then(([[user]]) => {
+        res.status(200).send({user});
+    })
 })
 
 // TEST Authorization
