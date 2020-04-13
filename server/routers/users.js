@@ -44,12 +44,11 @@ router.post("/signup", createUser, sendToken, (req, res) => {
 })
 
 const login = (req, res, next) => {
-    const username = req.body.username;
-    const email = req.body.email;
+    const user = req.body.user;
     const providedPassword = req.body.password;
     pool.query(
         `SELECT password, id FROM users WHERE username = ? OR email = ? LIMIT 1`,
-        [username, email]
+        [user, user]
     ).then(([result]) => {
         if(result.length == 0){
             res.sendStatus(401);
@@ -74,6 +73,20 @@ router.post("/login", login, sendToken, (req, res) => {
         FROM users
         WHERE id = ${req.userID}
         `
+    ).then(([[user]]) => {
+        res.status(200).send({user});
+    })
+})
+
+router.get("/user", authorize, (req, res) => {
+    pool.query(
+        `
+        SELECT
+            username, email, id
+        FROM users
+        WHERE username = ?
+        `,
+        [req.username]
     ).then(([[user]]) => {
         res.status(200).send({user});
     })
