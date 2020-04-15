@@ -43,6 +43,7 @@ router.post("/signup", createUser, sendToken, (req, res) => {
     })
 })
 
+
 const login = (req, res, next) => {
     const user = req.body.user;
     const providedPassword = req.body.password;
@@ -92,6 +93,37 @@ router.get("/user", authorize, (req, res) => {
         res.status(200).send({user});
     })
 })
+
+/*router.patch("/user", authorize, (req, res) => {
+    pool.query(
+        `SELECT password, id, username FROM users WHERE username = ? LIMIT 1`,
+        [req.username]
+    ).then(([[user]]) => {
+        const username = !req.body.username || req.body.username == "" ? user.username : req.body.username;
+        const email = !req.body.email || req.body.email == "" ? user.email : req.body.email;
+        const password = !req.body.password || req.body.password == "" ? user.password : req.body.password;
+        pool.query(
+            `SELECT password, id, username FROM users WHERE username = ? OR email = ? LIMIT 1`,
+            [username, email]
+        ).then(([userSelectResult]) => {
+            if(userSelectResult.length > 0 && userSelectResult[0].username != req.username){
+                res.sendStatus(400);
+            }else{
+                pool.query(
+                    `
+                    UPDATE
+                        username = ?, email = ?, password = ?
+                    FROM users
+                    WHERE id = ${req.userID}
+                    `,
+                    [username || userSelectResult[0].username, email || userSelectResult[0].email || password || userSelectResult[0].password]
+                ).then(([[user]]) => {
+                    res.status(200).send({user});
+                })
+            }
+        })
+    })
+})*/
 
 router.post("/logout", (req, res) => {
     res.cookie(

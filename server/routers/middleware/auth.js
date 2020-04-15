@@ -22,14 +22,14 @@ const sendToken = (req, res, next) => {
     jwt.sign({
         username : (req.body && req.body.username ? req.body.username : req.username)
     }, process.env.TOKEN_SECRET, {
-        expiresIn: 60
+        expiresIn: 60000
     }, (err, token) => {
         if(err){
             res.sendStatus(500);
         }else{
             res.cookie(
                 "TOKEN", token,
-                {maxAge : 60000, httpOnly : true}
+                {maxAge : 60000000, httpOnly : true}
             );
             next();
         }
