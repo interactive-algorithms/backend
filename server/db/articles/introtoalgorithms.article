@@ -11,7 +11,7 @@ What\'s next?
     img "IntroToAlgorithms/algorithms.png" "what is an algorithm" "Illustration of an algorithm"
     h4 "How are algorithms represented in a computer?"
     p "In a computer everything is stored in memory and this memory contains bytes of data"
-    p "A single instruction in an algorithm is typically 2 bytes, which is equivalent to 16 bits and therefore \\2^16\\ amount of variations."
+    p "A single instruction in an algorithm is typically 2 bytes, which is equivalent to 16 bits and therefore \\(2^{16}\\) amount of variations."
 2
     h2 "Why do we need algorithms?"
     p "A computer is stupid. In order for a computer to provide us with the ressources we need, there has to be someway of communicating with it"
