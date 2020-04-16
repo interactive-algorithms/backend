@@ -127,6 +127,10 @@ const importAllArticles = () => {
                         idx++;
                     }
                 }
+                console.log(title)
+                console.log(amountOfSections)
+                console.log(sectionTitles)
+                console.log(sectionContent)
                 // insert data in db
                 promisePool
                 .query(`SELECT id FROM articles WHERE title='${title}' LIMIT 1`)

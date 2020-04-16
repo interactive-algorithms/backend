@@ -1,0 +1,52 @@
+TITLE Introduction to algorithms
+SECTIONS 5
+What is an algorithm?
+Why do we need algorithms?
+An example
+Different types of algorithms
+What\'s next?
+1
+    h2 "What is an algorithm?"
+    p "An algorithm is a list of instructions that are easily interpreted."
+    img "IntroToAlgorithms/algorithms.png" "what is an algorithm" "Illustration of an algorithm"
+    h4 "How are algorithms represented in a computer?"
+    p "In a computer everything is stored in memory and this memory contains bytes of data"
+    p "A single instruction in an algorithm is typically 2 bytes, which is equivalent to 16 bits and therefore \\2^16\\ amount of variations."
+2
+    h2 "Why do we need algorithms?"
+    p "A computer is stupid. In order for a computer to provide us with the ressources we need, there has to be someway of communicating with it"
+    p "An algorithm is the solution, since it contains simple intructions which a computer may understand."
+3
+    h2 "An example of an algorithm"
+    p "A simple algorithm if the following"
+    h4 "The algorithmic walk towards north-east"
+    h5 "1. Take a step north"
+    h5 "2. Take a step east"
+    h5 "3. Go to step 1"
+    p "_"
+    p "The above algorithm could be implemented like this is in python code"
+    code "x=0"
+    code "y=0"
+    code "while True:"
+    code "___ x = x + 1"
+    code "___ y = y + 1"
+4
+    h2 "Different types of algorithms"
+    p "Many types of algorithms exist. This sections gives you an overview of some of the most important ones."
+    h4 "Greedy algorithms"
+    p "An algorithm where greedy choices are made to optain an optimal result."
+    h4 "Graph algorithms"
+    p "Algorithms based on graphs."
+    h4 "Geometry algorithms"
+    p "Algorithms for geometry."
+    h4 "Recursive algorithms"
+    p "Algorithms where a function calls itself <em>recursively</em>."
+    h4 "... and many more"
+5
+    h2 "What\'s next?"
+    p "We recommend reading and interacting with the following courses."
+    h4 "Introduction to complexity theory"
+    h4 "10 basic algorithms"
+    h4 "Sorting algorithms"
+    h4 "Recursion"
+    h4 "Introduction to graph theory"
