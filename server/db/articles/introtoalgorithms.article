@@ -1,10 +1,15 @@
 TITLE Introduction to algorithms
 SECTIONS 5
 What is an algorithm?
+NONE
 Why do we need algorithms?
+NONE
 An example
+CODE-ALGORITHMICWALK
 Different types of algorithms
+NONE
 What\'s next?
+NONE
 1
     h2 "What is an algorithm?"
     p "An algorithm is a list of instructions that are easily interpreted."

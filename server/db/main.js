@@ -20,7 +20,7 @@ const createGenericItemsTable = "CREATE TABLE IF NOT EXISTS `interactive-algorit
 
 const createImagesTable = "CREATE TABLE IF NOT EXISTS `interactive-algorithms`.`images` (`id` INT NOT NULL AUTO_INCREMENT,`genericItemID` INT NOT NULL,`URL` VARCHAR(256) NOT NULL,`alt` VARCHAR(256) NOT NULL,`description` TEXT(65535) NULL,PRIMARY KEY (`id`));";
 
-const createSectionsTable ="CREATE TABLE IF NOT EXISTS `interactive-algorithms`.`sections` (`id` INT NOT NULL AUTO_INCREMENT,`title` VARCHAR(256) NOT NULL,`position` INT NOT NULL,`articleID` INT NOT NULL,PRIMARY KEY (`id`));"
+const createSectionsTable ="CREATE TABLE IF NOT EXISTS `interactive-algorithms`.`sections` (`id` INT NOT NULL AUTO_INCREMENT,`title` VARCHAR(256) NOT NULL,`interactiveType` VARCHAR(256) NOT NULL,`position` INT NOT NULL,`articleID` INT NOT NULL,PRIMARY KEY (`id`));"
 
 const createMessagesTable = "CREATE TABLE IF NOT EXISTS `interactive-algorithms`.`messages` (`id` INT NOT NULL AUTO_INCREMENT,`time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,`content` TEXT NULL,`username` VARCHAR(45) NOT NULL,`sectionID` INT NOT NULL,PRIMARY KEY (`id`));";
 
@@ -70,11 +70,13 @@ const importAllArticles = () => {
                 const title = lines[0].slice(1, lines[0].length).join(" ");
                 const amountOfSections = Number(lines[1][1]);
                 const sectionTitles = [];
-                for(let i = 0; i < amountOfSections; i++){
+                const interactiveTypes = [];
+                for(let i = 0; i < amountOfSections * 2; i += 2){
                     sectionTitles.push(lines[2 + i].join(" "));
+                    interactiveTypes.push(lines[2 + i + 1].join(" "));
                 }
                 const sectionContent = {};
-                let idx = 2 + amountOfSections;
+                let idx = 2 + amountOfSections * 2;
                 while(idx < lines.length){
                     const section = Number(lines[idx++][0]) - 1;
                     sectionContent[section] = [];
@@ -130,6 +132,7 @@ const importAllArticles = () => {
                 console.log(title)
                 console.log(amountOfSections)
                 console.log(sectionTitles)
+                console.log(interactiveTypes)
                 console.log(sectionContent)
                 // insert data in db
                 promisePool
@@ -141,7 +144,7 @@ const importAllArticles = () => {
                         .then(([articleInsertionResult]) => {
                             for(let i = 0; i < amountOfSections; i++){
                                 promisePool
-                                .query(`INSERT INTO sections (title, position, articleID) VALUES ('${sectionTitles[i]}',${i},${articleInsertionResult.insertId});`)
+                                .query(`INSERT INTO sections (title, position, articleID, interactiveType) VALUES ('${sectionTitles[i]}',${i},${articleInsertionResult.insertId},'${interactiveTypes[i]}');`)
                                 .then(([sectionInsertionResult]) => {
                                     for(let j = 0; j < sectionContent[i].length; j++){
                                         const item = sectionContent[i][j];

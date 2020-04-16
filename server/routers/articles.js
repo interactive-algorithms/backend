@@ -44,6 +44,7 @@ router.get("/:id", (req, res) => {
             articles.id as articleID,
             articles.title as articleTitle,
             sections.title as sectionTitle,
+            sections.interactiveType as interactiveType,
             sections.id as sectionID,
             type,
             content,
@@ -75,6 +76,7 @@ router.get("/:id", (req, res) => {
                 sectionIndices[item.sectionID] = article.sections.length;
                 article.sections.push({
                     title : item.sectionTitle,
+                    interactiveType : item.interactiveType,
                     id : item.sectionID,
                     content : []
                 })
