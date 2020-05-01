@@ -1,0 +1,22 @@
+version: '3'
+services:
+    mysql:
+        image: mysql:8.0.20
+        ports:
+            - '27017:27017'
+        environment: 
+            - MYSQL_ROOT_PASSWORD=$zfo31Jknz8$BGc7A&OkC6nH40H0D@ay&E7&j2mu*xxFxUQxkFeTkTwO
+            - MYSQL_DATABASE=interactive-algorithms
+    backend:
+        build: .
+        ports:
+            - '8000:8000'
+        links:
+            - "mysql"
+        environment: 
+            - FRONTEND_URL=http://139.162.143.213:3000
+            - DB_HOST=mysql
+            - DB_PASSWORD=$zfo31Jknz8$BGc7A&OkC6nH40H0D@ay&E7&j2mu*xxFxUQxkFeTkTwO
+            - DB_USER=root
+            - PORT=8000
+            - TOKEN_SECRET=dbnzR&lOkqGWw1n2ZCJ2XrNO*t7fqQvh!mQ06eRz4RiUkq2th39gws8@

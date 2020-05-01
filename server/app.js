@@ -13,7 +13,7 @@ require("./db/main"); // init db
 app.use(express.json());
 app.use(cors({
   credentials: true,
-  origin: 'http://localhost:3000'
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000'
 }));
 app.use(expressCookieParser())
 

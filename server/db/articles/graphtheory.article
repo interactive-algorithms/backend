@@ -1,0 +1,13 @@
+TITLE Graph theory
+SECTIONS 2
+Graphs
+NONE
+Trees
+NONE
+1
+    h2 "Graphs"
+    p "This is a graph"
+    img "graph.png" "image failed to show a graph" "This is a graph"
+    code "a = 1"
+2
+    h6 "bla bla"
