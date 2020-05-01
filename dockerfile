@@ -3,4 +3,4 @@ WORKDIR /usr/src/BE
 EXPOSE 8000
 COPY . .
 RUN npm install
-CMD [ "npm", "run", "all" ]
+CMD [ "npm", "run", "start" ]
