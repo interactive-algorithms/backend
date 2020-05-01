@@ -3,4 +3,5 @@ WORKDIR /usr/src/BE
 EXPOSE 8000
 COPY . .
 RUN npm install
-CMD [ "npm", "run", "start" ]
+RUN chmod +x ./wait.sh
+CMD [ "./wait.sh" ]
