@@ -1,12 +1,12 @@
-TITLE **title**
+TITLE Example (test) article
 SECTIONS 2
-section wfjnewjnfje
+section 1
 NONE
-section 2ejrngjnreg
+section 2
 NONE
 1
     **type** "**content**"
-    img "url" "alt wdjwnd wdjnwd" "description hello there wd"
+    img "url" "alt" "description"
 2
     **type** "**content**"
     img "url" "alt" "description"
