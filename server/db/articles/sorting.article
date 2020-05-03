@@ -1,14 +1,34 @@
-TITLE Sorting Algorithms wdkwdk
-SECTIONS 2
-section merge sort
+TITLE Sorting Algorithms
+SECTIONS 8
+What is sorting?
 NONE
-section 2ejrngjnreg wjndwjd
-NONE
+Bubble sort
+SORTING-BUBBLE
+Implement bubble sort
+CODE-BUBBLESORT
+Insertion sort
+SORTING-INSERTION
+Merge sort
+SORTING-MERGE
+Quick sort
+SORTING-QUICK
+Radix sort
+SORTING-RADIX
+Counting sort
+SORTING-COUNTING
 1
-    p "hello there i am a p tag"
-    p "hello webfhwbefheb i am a p tag"
-    img "thisisanurl" "alt wdjwnd wdjnwd" "description hello there wd"
+    h2 "What is sorting?"
 2
-    h1 "a h1 tag"
-    p "hello there i am a p tag"
-    img "url" "alt" "description"
+    h2 "Bubble sort"
+3
+    h2 "Implement bubble sort"
+4
+    h2 "Insertion sort"
+5
+    h2 "Merge sort"
+6
+    h2 "Quick sort"
+7
+    h2 "Radix sort"
+8
+    h2 "Counting sort"
