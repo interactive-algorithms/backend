@@ -18,10 +18,32 @@ Counting sort
 SORTING-COUNTING
 1
     h2 "What is sorting?"
+    p "Sorting is any process of arranging items in a systematical order. There are two common, yet distinct meanings of what sorting is"
+    ol "["Ordering. Which means arranging items in a sequenced order by some criteria","Categorizing. Which means grouping items with similar properties"]"
+    p "Sorting algorithms are often used to order items in a sequence. For example sorting an array of numbers, like below"
+    code "[3, 1, 2]"
+    p "Computers don\'t know how to sort that, or any other array with out being told what to do. And it is here that the computer needs an algorithm \(a systematic way to fix a problem\) to tell it how to sort the array."
+    h2 "How to measure the efficiency of a sorting algorithm"
+    p "You may have heard of Big O notation when talking about the efficiency of a sorting algorithm. Big O notation is a mathematical notation that describes the limiting behavior of a function, when the arguments tends towards infinity. But what does that mean? It means that you can use the Big O notation to describe an algorithms worst features when its argument tends towards infinity. You often write the Big O notation like \\(O\(n\)\\), \\(O\(n^2\)\\) or many others ways. The inside of the Big O notation describes the how long the algorithm take, when the arguments tends towards infinity. For example if an algorithm takes n arguments and the time complexity is \\(O\(n\)\\), then it means for every n arguments it takes n actions to complete the algorithm. So you often wants to have a low value in the Big O notation."
 2
     h2 "Bubble sort"
+    p "Bubble sort has a Big O notation of \\(O\(n^2\)\\), which is quite bad. It means that on average it takes \\(n^2\\) action to sort an array that has n items in it. For example if you try to sort an array with 50 items, then it takes 2500 actions on average to fully sort the array. You can see in the next chapter how the bubble sort algorithm works."
 3
     h2 "Implement bubble sort"
+    p "Bubble sort takes to arranging, the size of the array and the array. A Pseudocode implementation of the algorithm looks something like this"
+    code "fun bubbleSort(n, arr) {"
+    code "	repeat {"
+    code "		swapped = false"
+    code "		for i = 0 to n {"
+    code "			if arr[i] < arr[i + 1] {"
+    code "			swap(arr[i], arr[i + 1])"
+    code "			swapped = true"
+    code "			}"
+    code "		}"
+    code "		n = n - 1"
+    code "	} while not swapped"
+    code "	return arr"
+    code "}"
 4
     h2 "Insertion sort"
 5
